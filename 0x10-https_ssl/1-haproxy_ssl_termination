@@ -33,18 +33,18 @@ defaults
         errorfile 503 /etc/haproxy/errors/503.http
         errorfile 504 /etc/haproxy/errors/504.http
 
-frontend  selasi-frontend-http
+frontend  nouha-frontend-http
         bind *:80
         mode http
         http-request set-header X-Forwarded-Proto http
-        default_backend selasi-backend
+        default_backend nouha-backend
 
-frontend selasi-frontend-https
-        bind *:443 ssl crt /etc/haproxy/certs/selasi.tech.pem
+frontend nouha-frontend-https
+        bind *:443 ssl crt /etc/haproxy/certs/nouha.tech.pem
         http-request set-header X-Forwarded-Proto https
-        default_backend selasi-backend
+        default_backend nouha-backend
 
-backend selasi-backend
+backend nouha-backend
         balance roundrobin
-	server 192925-web-01 3.90.70.66
-	server 192925-web-02 100.26.231.45
+	server 192925-web-01 34.207.188.121 check
+	server 192925-web-02 34.224.63.185  check
