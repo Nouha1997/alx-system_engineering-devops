@@ -7,7 +7,7 @@ from sys import argv
 def get_todos_by_employee(employee_id):
     """ Return TODOS list progress for a given employee_id """
     api_url = 'https://jsonplaceholder.typicode.com/'
-    todos_url = f'{api_url}/users/{employee_id}/todos'
+    todos_url = '{}/users/{}/todos'.format(api_url,employee_id)
     users_url = f'{api_url}/users/{employee_id}'
 
     todos_list = requests.get(todos_url).json()
