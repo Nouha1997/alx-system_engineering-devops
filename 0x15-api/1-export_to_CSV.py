@@ -1,28 +1,27 @@
 #!/usr/bin/python3
-"""
-A Python script that, using this REST API, for a given employee ID,
-returns information about his/her TODO list progress and
-export data in the CSV format.
-"""
-
+""" Export to CSV """
 import requests
 from sys import argv
 
 
-if __name__ == '__main__':
-    eid = argv[1]
-    userUrl = "https://jsonplaceholder.typicode.com/users"
-    url = userUrl + "/" + eid
+def export_to_csv(user_id):
+    """ Export TODOS list progress for a given employee_id """
+    api_url = 'https://jsonplaceholder.typicode.com/'
+    todos_url = f'{api_url}/users/{user_id}/todos'
+    users_url = f'{api_url}/users/{user_id}'
 
-    response = requests.get(url)
-    uname = response.json().get('username')
+    todos_list = requests.get(todos_url).json()
+    users_list = requests.get(users_url).json()
 
-    todoUrl = url + "/todos"
-    response = requests.get(todoUrl)
-    tasks = response.json()
+    username = users_list['username']
 
-    with open('{}.csv'.format(eid), 'w') as f:
-        for task in tasks:
-            f.write('"{}","{}","{}","{}"\n'
-                    .format(eid, uname, task.get('completed'),
-                            task.get('title')))
+    with open(f'{user_id}.csv', mode='w', encoding='utf-8') as file:
+        for task in todos_list:
+            completed = task.get('completed')
+            title = task.get('title')
+            file.write(f'"{user_id}","{username}","{completed}","{title}"\n')
+
+
+if __name__ == "__main__":
+    if len(argv) == 2:
+        export_to_csv(int(argv[1]))

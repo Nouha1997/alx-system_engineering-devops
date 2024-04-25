@@ -1,38 +1,28 @@
 #!/usr/bin/python3
-"""
-A Python script that, using this REST API, returns
-all information all users' TODO list progress
-and export data in the JSON format.
-"""
-
+""" Dictionary of list of diectionaries """
 import json
 import requests
+from sys import argv
 
 
-if __name__ == '__main__':
-    url = "https://jsonplaceholder.typicode.com/users"
+def list_dictionaries():
+    """ List of tasks for all employees """
+    api_url = 'https://jsonplaceholder.typicode.com/'
+    users_url = f'{api_url}/users/'
 
-    response = requests.get(url)
-    users = response.json()
+    users_list = requests.get(users_url).json()
 
-    dic = {}
-    for user in users:
-        userId = user.get('id')
-        uname = user.get('username')
+    with open(f'todo_all_employees.json', mode='w', encoding='utf-8') as file:
+        json.dump({user.get('id'): [
+            {
+                'username': user.get('username'),
+                'task': task.get('title'),
+                'completed': task.get('completed')
+            }
+            for task in requests.get('{}/{}/todos/'
+                                     .format(users_url, user.get('id'))).json()
+        ] for user in users_list}, file)
 
-        url = 'https://jsonplaceholder.typicode.com/users/{}'.format(userId)
-        url = url + '/todos/'
 
-        response = requests.get(url)
-        tasks = response.json()
-        dic[userId] = []
-
-        for task in tasks:
-            dic[userId].append({
-                "task": task.get('title'),
-                "completed": task.get('completed'),
-                "username": uname
-            })
-
-    with open('todo_all_employees.json', 'w') as f:
-        json.dump(dic, f)
+if __name__ == "__main__":
+    list_dictionaries()
