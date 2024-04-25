@@ -1,34 +1,29 @@
 #!/usr/bin/python3
-"""
-A Python script that, using this REST API, for a given employee ID,
-returns information about his/her TODO list progress and
-export data in the JSON format.
-"""
-
+""" EXport to JSON """
 import json
 import requests
 from sys import argv
 
 
-if __name__ == '__main__':
-    eid = argv[1]
-    userUrl = "https://jsonplaceholder.typicode.com/users"
-    url = userUrl + "/" + eid
+def export_to_json(user_id):
+    """ Export JSON TODOS list progress for a given employee_id """
+    api_url = 'https://jsonplaceholder.typicode.com/'
+    todos_url = f'{api_url}/users/{user_id}/todos'
+    users_url = f'{api_url}/users/{user_id}'
 
-    response = requests.get(url)
-    uname = response.json().get('username')
+    todos_list = requests.get(todos_url).json()
+    users_list = requests.get(users_url).json()
 
-    todoUrl = url + "/todos"
-    response = requests.get(todoUrl)
-    tasks = response.json()
+    username = users_list['username']
 
-    dic = {eid: []}
-    for task in tasks:
-        dic[eid].append({
-            "task": task.get('title'),
-            "completed": task.get('completed'),
-            "username": uname
-        })
+    with open(f'{user_id}.json', mode='w', encoding='utf-8') as file:
+        json.dump({user_id: [{
+            'task': task.get('title'),
+            'completed': task.get('completed'),
+            'username': username
+        } for task in todos_list]}, file)
 
-    with open('{}.json'.format(eid), 'w') as f:
-        json.dump(dic, f)
+
+if __name__ == "__main__":
+    if len(argv) == 2:
+        export_to_json(int(argv[1]))
